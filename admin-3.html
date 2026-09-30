@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin | NoobCraftBloxTT</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#0b1020;color:#fff;font-family:Arial,sans-serif}
+header{background:linear-gradient(135deg,#7c3aed,#4f46e5);padding:28px 18px;text-align:center}
+main{max-width:650px;margin:auto;padding:18px}.box{background:#182033;border-radius:18px;padding:20px;margin:16px 0;box-shadow:0 8px 25px #0005}
+h1,h2{margin-top:0}input,button{width:100%;padding:14px;margin-top:10px;border:0;border-radius:11px;font-size:16px}
+input{background:#303b52;color:#fff}button{background:#8b5cf6;color:#fff;font-weight:700}button.red{background:#dc2626}
+#panel{display:none}.msg{margin-top:12px}.admin{background:#303b52;padding:12px;border-radius:11px;margin-top:9px;word-break:break-all}
+.small{font-size:13px;color:#b8c1d4;line-height:1.45}
+</style>
+</head>
+<body>
+<header>
+<h1>👑 NoobCraftBloxTT</h1>
+<p>🔐 Panneau Admin</p>
+</header>
+<main>
+
+<section id="login" class="box">
+<h2>Connexion administrateur</h2>
+<input id="code" type="password" placeholder="Mot de passe">
+<button onclick="connect()">🔓 Se connecter</button>
+<div id="loginMsg" class="msg"></div>
+</section>
+
+<section id="panel">
+<div class="box">
+<h2>⚙️ Administration</h2>
+<p>✅ Connecté en tant qu'administrateur</p>
+<button onclick="location.href='./'">🏠 Retour au site</button>
+<button class="red" onclick="disconnect()">🚪 Déconnexion</button>
+</div>
+
+<div class="box">
+<h2>👑 Donner le rôle Admin</h2>
+<p>Entre l'<b>adresse e-mail</b> de la personne à ajouter.</p>
+<input id="email" type="email" placeholder="Adresse e-mail de l'admin">
+<button onclick="addAdmin()">➕ Ajouter Admin</button>
+<div id="list"></div>
+<p class="small">Les adresses sont enregistrées uniquement dans ce navigateur. Cette page ne donne pas réellement des permissions à GitHub, Roblox ou TikTok.</p>
+</div>
+</section>
+</main>
+
+<script>
+const ADMIN_PASSWORD="lovemaman";
+let admins=JSON.parse(localStorage.getItem("ncb_admin_emails")||"[]");
+
+function connect(){
+ const value=document.getElementById("code").value;
+ if(value===ADMIN_PASSWORD){
+   document.getElementById("login").style.display="none";
+   document.getElementById("panel").style.display="block";
+   showAdmins();
+ }else{
+   document.getElementById("loginMsg").textContent="❌ Mot de passe incorrect.";
+ }
+}
+function disconnect(){
+ document.getElementById("panel").style.display="none";
+ document.getElementById("login").style.display="block";
+ document.getElementById("code").value="";
+}
+function addAdmin(){
+ const input=document.getElementById("email");
+ const email=input.value.trim();
+ if(!email || !email.includes("@")){
+   alert("Entre une adresse e-mail valide.");
+   return;
+ }
+ if(!admins.includes(email)) admins.push(email);
+ localStorage.setItem("ncb_admin_emails",JSON.stringify(admins));
+ input.value="";
+ showAdmins();
+}
+function removeAdmin(index){
+ admins.splice(index,1);
+ localStorage.setItem("ncb_admin_emails",JSON.stringify(admins));
+ showAdmins();
+}
+function showAdmins(){
+ const list=document.getElementById("list");
+ if(!admins.length){
+   list.innerHTML='<div class="admin">Aucun admin ajouté.</div>';
+   return;
+ }
+ list.innerHTML=admins.map((email,i)=>
+ '<div class="admin">📧 '+escapeText(email)+
+ '<button class="red" onclick="removeAdmin('+i+')">🗑️ Supprimer</button></div>'
+ ).join("");
+}
+function escapeText(text){
+ return text.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+}
+</script>
+</body>
+</html>
